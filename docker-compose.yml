@@ -1,0 +1,54 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: pwncortex-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles: ["local"]
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: pwncortex-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - pwncortex-db:/app/data
+      - pwncortex-uploads:/app/uploads
+    environment:
+      - DATABASE_URL=sqlite:////app/data/pwncortex.db
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:3b}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-anthropic/claude-3.5-haiku}
+    depends_on:
+      ollama:
+        condition: service_healthy
+        required: false
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: pwncortex-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  ollama-models:
+  pwncortex-db:
+  pwncortex-uploads:

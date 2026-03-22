@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Cache
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.cache/
+*.cache
+
+# Database
+*.db
+*.sqlite3
+
+# Uploads (scan files — never commit)
+uploads/
+
+# Node
+node_modules/
+src/web/dist/
+src/web/.vite/
+
+# Environment — only .env.example is committed
+.env
+.env.local
+.env.*.local
+.env.ci
+.env.ci.example
+
+# Security scan outputs (generated locally or on CI VPS)
+security-reports/
+coverage.xml
+bandit-report.json
+coverage/
+.last-security-scan
+
+# CI output artifacts
+ci_output.txt
+pytest_out.txt
+pytest_out_*.txt
+build_log.txt
+ruff_out.json
+
+# AI / Dev tooling docs (not needed to run)
+AGENT.md
+CLAUDE_CONTEXT.md
+
+# Temporary / scratch files
+tmp_refactor.py
+
+# External CI/analysis configs
+sonar-project.properties
+
+# Design/spec docs (dev-only)
+docs/
+
+# Dev/CI — ficam locais, não sobem ao repo
+bin/
+tests/
+docker-compose.dev.yml
+
+# OS
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# AI
+.claude/
+.agents/
+.claude.yaml
+.agents.yaml
+.claude.yml
+CLAUDE.md

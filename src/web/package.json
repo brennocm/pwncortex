@@ -1,0 +1,44 @@
+{
+  "name": "pwncortex-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "axios": "^1.6.2",
+    "cytoscape": "^3.28.0",
+    "easymde": "^2.18.0",
+    "html2pdf.js": "^0.14.0",
+    "react": "^18.2.0",
+    "react-cytoscapejs": "^2.0.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^6.20.0",
+    "react-simplemde-editor": "^5.2.0"
+  },
+  "overrides": {
+    "flatted": "3.4.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/ui": "^4.1.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.57.0",
+    "jsdom": "^24.0.0",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^6.1.0",
+    "vitest": "^4.1.0"
+  }
+}

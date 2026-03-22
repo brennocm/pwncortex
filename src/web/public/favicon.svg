@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="#0a0a0a"/>
+
+  <!-- Edges -->
+  <line x1="16" y1="13" x2="8"  y2="22" stroke="#c79800" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="16" y1="13" x2="24" y2="22" stroke="#c79800" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="16" y1="13" x2="16" y2="5"  stroke="#c79800" stroke-width="1.2" stroke-opacity="0.55"/>
+  <line x1="16" y1="13" x2="26" y2="11" stroke="#c79800" stroke-width="1.2" stroke-opacity="0.55"/>
+
+  <!-- Satellite nodes -->
+  <circle cx="16" cy="5"  r="2.2" fill="#c79800" fill-opacity="0.75"/>
+  <circle cx="8"  cy="22" r="2.2" fill="#c79800" fill-opacity="0.75"/>
+  <circle cx="24" cy="22" r="2.2" fill="#c79800" fill-opacity="0.75"/>
+  <circle cx="26" cy="11" r="2.2" fill="#00e6ac" fill-opacity="0.75"/>
+
+  <!-- Central node -->
+  <circle cx="16" cy="13" r="3.8" fill="#c79800"/>
+  <circle cx="16" cy="13" r="2.2" fill="#0a0a0a"/>
+</svg>
