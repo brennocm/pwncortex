@@ -125,7 +125,7 @@ Alterne entre Ollama local e OpenRouter sem reiniciar o stack. A API key nunca √
 
 ```bash
 # Clone o reposit√≥rio
-git clone https://github.com/your-org/pwncortex.git
+git clone https://github.com/brennocm/pwncortex.git
 cd pwncortex
 
 # Copie e configure o .env
