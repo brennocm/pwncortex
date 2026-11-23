@@ -1,204 +1,203 @@
 <div align="center">
   <img src="src/web/public/favicon.svg" alt="PwnCortex" width="120"/>
   <h1>PwnCortex</h1>
-  <p><strong>Plataforma de produtividade para pentests com IA — 100% self-hosted.</strong></p>
+  <p><strong>Pentest productivity platform with AI, 100% self-hosted.</strong></p>
   <p>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="License" /></a>
   </p>
 </div>
 
-## O que é o PwnCortex
+## What PwnCortex is
 
-O PwnCortex foi construído para resolver um problema real do pentester moderno: **centralizar toda a inteligência de um engagement em um único lugar, com IA contextual integrada**. Ao contrário de planilhas soltas e ferramentas fragmentadas, o PwnCortex transforma scans brutos (Nmap XML, JSON, MD, TXT) em uma topologia de rede interativa, enriquece cada host automaticamente via NVD/CVE, permite análise em linguagem natural com um LLM que conhece todo o contexto do projeto, e gera um relatório executivo com scoring CVSS pronto para o cliente. Tudo localmente, sem telemetria, sem nuvem.
-
----
-
-## Funcionalidades
-
-- **Ingestão Unificada de Scans**: importe Nmap XML, JSON, Markdown ou texto puro. Portas, serviços, strings CPE e saída de scripts NSE são parseados em registros estruturados automaticamente.
-- **Grafo de Rede Interativo**: topologia Cytoscape.js construída a partir dos scans ingeridos. Selecione um nó para ver portas, vulnerabilidades e explicações geradas por IA (cacheadas por sessão).
-- **AI Chat Contextual**: faça perguntas sobre o alvo em linguagem natural. O LLM recebe o contexto completo do projeto (nós, portas, vulns, notas) a cada mensagem. Suporta Ollama local e OpenRouter.
-- **Notas de Evidência**: crie, filtre e pesquise findings com ciclo de vida `Rascunho → Verificado → Reportado`. Notas verificadas sincronizam automaticamente com o rascunho do relatório executivo.
-- **Relatório Executivo Automatizado**: gera relatório confidencial em Markdown com sumário executivo, scorecard de risco, roadmap de remediação ranqueado por CVSS e apêndice técnico. Exportável para PDF.
-- **Checklist OWASP WSTG**: 121 itens nas categorias Web, Rede, Active Directory e Infraestrutura com rastreamento de status por item e progresso visual.
-- **Dois Provedores de LLM**: use Ollama local (padrão: `qwen2.5:3b`) para engagements air-gapped, ou troque para qualquer modelo OpenRouter pela interface a qualquer momento.
-- **Enriquecimento NVD/CVE**: vulnerabilidades são automaticamente enriquecidas com scores CVSS da API do NVD.
-- **100% Local**: sem telemetria, sem dependência de nuvem. Todos os dados ficam em um banco SQLite na sua máquina.
+PwnCortex was built for a real problem of the modern pentester: **keeping all the intelligence of an engagement in one place, with context-aware AI built in**. Instead of loose spreadsheets and scattered tools, PwnCortex turns raw scans (Nmap XML, JSON, MD, TXT) into an interactive network topology, enriches each host automatically with NVD/CVE data, lets you ask questions in natural language to an LLM that knows the whole project, and produces an executive report with CVSS scoring, ready for the client. Everything runs locally, with no telemetry and no cloud.
 
 ---
 
-## Conceitos Técnicos
+## Features
 
-### Contexto Compartilhado de IA
-A cada mensagem no AI Chat, o LLM recebe um *system prompt* construído dinamicamente com todos os nós, portas abertas, vulnerabilidades e notas do projeto. Isso elimina a necessidade de copiar e colar dados manualmente. Logo, o modelo sempre sabe exatamente o que está no escopo.
-
-### Ciclo de Vida das Notas
-As notas seguem um pipeline `Draft → Verified → Reported`. Quando uma nota é marcada como `Verified` ou `Reported`, ela é sincronizada automaticamente via BackgroundTask para o `report_draft` do projeto, garantindo que o relatório executivo sempre reflita o estado atual da investigação.
-
-### Scoring CVSS Automático
-O relatório executivo calcula um **Overall Risk Score** por host usando soma de quadrados normalizada dos scores CVSS. Se um CVE não possui score no banco, o sistema infere o valor pela severidade (Critical→9.5, High→7.5, Medium→5.0, Low→2.5) e marca como *(inferido)*.
-
-### Cache de Explicações por Nó
-Cada vez que o LLM gera uma explicação para um nó (portas, serviços, recomendações), ela é persistida no banco. O cache é invalidado automaticamente quando novos dados de scan ou notas são adicionados ao nó, garantindo que a explicação sempre esteja atualizada.
+- **Unified scan ingestion**: import Nmap XML, JSON, Markdown or plain text. Ports, services, CPE strings and NSE script output are parsed into structured records automatically.
+- **Interactive network graph**: a Cytoscape.js topology built from the ingested scans. Select a node to see its ports, vulnerabilities and AI-generated explanations (cached per session).
+- **Context-aware AI chat**: ask about the target in natural language. The LLM receives the full project context (nodes, ports, vulns, notes) with every message. Supports local Ollama and OpenRouter.
+- **Evidence notes**: create, filter and search findings with a `Draft → Verified → Reported` lifecycle. Verified notes sync automatically into the executive report draft.
+- **Automated executive report**: generates a confidential Markdown report with an executive summary, risk scorecard, remediation roadmap ranked by CVSS and a technical appendix. Exportable to PDF.
+- **OWASP WSTG checklist**: 121 items across Web, Network, Active Directory and Infrastructure, with per-item status and visual progress.
+- **Two LLM providers**: use local Ollama (default: `qwen2.5:3b`) for air-gapped engagements, or switch to any OpenRouter model from the interface at any time.
+- **NVD/CVE enrichment**: vulnerabilities are enriched automatically with CVSS scores from the NVD API.
+- **100% local**: no telemetry, no cloud dependency. All data stays in a SQLite database on your machine.
 
 ---
 
-## Tour Visual
+## Technical concepts
 
-O PwnCortex oferece uma interface técnica e escura, projetada para longas sessões de trabalho com foco em densidade de informação.
+### Shared AI context
+With every AI chat message, the LLM receives a *system prompt* built on the fly with every node, open port, vulnerability and note in the project. You never copy and paste data by hand, and the model always knows exactly what is in scope.
 
-### 1. Dashboard — Gestão de Projetos
-Crie e gerencie seus engagements. Cada projeto é isolado com UUID próprio.
+### Note lifecycle
+Notes follow a `Draft → Verified → Reported` pipeline. When a note is marked `Verified` or `Reported`, a BackgroundTask syncs it into the project's `report_draft`, so the executive report always reflects the current state of the investigation.
+
+### Automatic CVSS scoring
+The executive report computes an **Overall Risk Score** per host as a normalized sum of squares of the CVSS scores. If a CVE has no score in the database, the system infers one from the severity (Critical→9.5, High→7.5, Medium→5.0, Low→2.5) and marks it as *(inferred)*.
+
+### Per-node explanation cache
+Each time the LLM explains a node (ports, services, recommendations), the explanation is stored in the database. The cache is invalidated automatically when new scan data or notes are added to the node, so the explanation stays current.
+
+---
+
+## Visual tour
+
+PwnCortex has a dense, dark technical interface designed for long working sessions.
+
+### 1. Dashboard: project management
+Create and manage your engagements. Each project is isolated with its own UUID.
 
 <div align="center">
   <img src="assets/dashboard.png" alt="Dashboard" width="48%">
-  <img src="assets/dashboard-new-project.png" alt="Criar projeto" width="48%">
+  <img src="assets/dashboard-new-project.png" alt="Create project" width="48%">
 </div>
 
-*À esquerda: visão geral dos projetos ativos. À direita: modal de criação de projeto.*
+*Left: active projects. Right: the new project dialog.*
 
 ---
 
-### 2. Graph View — Topologia de Rede
-O coração visual do projeto. Após ingerir um scan, o grafo é construído automaticamente. Clique em qualquer nó para ver detalhes, portas, vulnerabilidades e solicitar explicação de IA.
+### 2. Graph view: network topology
+The visual core of the project. After you ingest a scan, the graph is built automatically. Click any node to see details, ports and vulnerabilities, and to ask the AI for an explanation.
 
 ![Graph View](assets/graph-view.png)
 
-*Topologia interativa com layout concentric. O painel direito exibe detalhes do nó selecionado com análise de IA cacheada.*
+*Interactive topology with a concentric layout. The right panel shows the selected node with its cached AI analysis.*
 
 ---
 
-### 3. Notas de Evidência
-Registre e organize findings com suporte a Markdown, filtros por status e busca full-text. Notas verificadas alimentam o relatório automaticamente.
+### 3. Evidence notes
+Record and organize findings with Markdown, status filters and full-text search. Verified notes feed the report automatically.
 
 <div align="center">
-  <img src="assets/notes-view.png" alt="Notas de Evidência" width="70%">
+  <img src="assets/notes-view.png" alt="Evidence notes" width="70%">
 </div>
 
-*lista de notas com filtros de status*
+*Note list with status filters.*
 
 ---
 
-### 4. AI Chat — Análise Contextual
-Converse com o LLM sobre o seu alvo. Use comandos slash para criar notas e registros de relatório diretamente pelo chat.
+### 4. AI chat: contextual analysis
+Talk to the LLM about your target. Slash commands create notes and report entries straight from the chat.
 
 ![AI Chat](assets/ai-chat.png)
 
-*O assistente explica vetores de ataque, sugere próximos passos e mantém todo o contexto do projeto na conversa.*
+*The assistant explains attack vectors, suggests next steps and keeps the whole project context in the conversation.*
 
-![Comando /report](assets/ai-chat-report-command.png)
+![/report command](assets/ai-chat-report-command.png)
 
-*Comando `/report` adicionando uma nota de analista ao rascunho do relatório executivo.*
-
----
-
-### 5. Relatório Executivo
-Gere um relatório confidencial em Markdown com linguagem executiva e técnica. Inclui scorecard de risco, roadmap de remediação por janela de tempo (0–48h / 2 sem / 30 dias / 90 dias) e apêndice técnico com todos os findings.
-
-![Relatório Executivo](assets/report-view.png)
+*The `/report` command adding an analyst note to the executive report draft.*
 
 ---
 
-### 6. Checklist OWASP WSTG
-121 itens de segurança organizados por categoria com rastreamento individual de status e progresso visual.
+### 5. Executive report
+Generate a confidential Markdown report in executive and technical language. It includes a risk scorecard, a remediation roadmap by time window (0–48 h / 2 weeks / 30 days / 90 days) and a technical appendix with every finding.
 
-![Checklist OWASP WSTG](assets/checklist-view.png)
+![Executive report](assets/report-view.png)
 
 ---
 
-### 7. Configuração do LLM
-Alterne entre Ollama local e OpenRouter sem reiniciar o stack. A API key nunca é exposta — apenas o booleano `key_set`.
+### 6. OWASP WSTG checklist
+121 security items organized by category, with individual status tracking and visual progress.
+
+![OWASP WSTG checklist](assets/checklist-view.png)
+
+---
+
+### 7. LLM settings
+Switch between local Ollama and OpenRouter without restarting the stack. The API key is never exposed, only a `key_set` boolean.
 
 <div align="center">
-  <img src="assets/llm-settings.png" alt="Configurações LLM" width="80%">
+  <img src="assets/llm-settings.png" alt="LLM settings" width="80%">
 </div>
 
 ---
 
-## Como Executar
+## Running it
 
-### Pré-requisitos
-- [Docker](https://docs.docker.com/get-docker/) instalado e rodando.
-- Plugin Compose (`docker compose version`).
+### Requirements
+- [Docker](https://docs.docker.com/get-docker/) installed and running.
+- The Compose plugin (`docker compose version`).
 
-### Instalação
+### Install
 
 ```bash
-# Clone o repositório
+# Clone the repository
 git clone https://github.com/brennocm/pwncortex.git
 cd pwncortex
 
-# Copie e configure o .env
+# Copy and edit the .env
 cp .env.example .env
 
-# Inicie o stack (interativo — seleciona modo Ollama local ou API)
+# Start the stack (interactive: choose local Ollama or an API)
 ./start.sh
 ```
 
-### Acesso
+### Access
 
-| Serviço | URL |
+| Service | URL |
 |---|---|
-| Interface Web | http://localhost:80 |
+| Web interface | http://localhost:80 |
 | API | http://localhost:8000 |
 | Ollama | http://localhost:11434 |
 
-### Desenvolvimento com Hot-Reload
+### Development with hot reload
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-# Frontend dev: http://localhost:5173
+# Frontend dev server: http://localhost:5173
 ```
 
-> **Parar**: `./stop.sh` — preserva volumes e banco de dados.
-> **Resetar**: `./reset.sh` — para containers, remove imagens e reconstrói do zero.
+> **Stop**: `./stop.sh` keeps volumes and the database.
+> **Reset**: `./reset.sh` stops containers, removes images and rebuilds from scratch.
 
-### Variáveis de Ambiente
+### Environment variables
 
-| Variável | Descrição | Padrão |
+| Variable | Description | Default |
 |:---|:---|:---|
-| `LLM_PROVIDER` | Provider ativo: `ollama` ou `openrouter` | `ollama` |
-| `OLLAMA_MODEL` | Modelo Ollama a utilizar | `qwen2.5:3b` |
-| `OPENROUTER_API_KEY` | API Key do OpenRouter (opcional) | — |
-| `OPENROUTER_MODEL` | Modelo OpenRouter a utilizar | `anthropic/claude-3.5-haiku` |
+| `LLM_PROVIDER` | Active provider: `ollama` or `openrouter` | `ollama` |
+| `OLLAMA_MODEL` | Ollama model to use | `qwen2.5:3b` |
+| `OPENROUTER_API_KEY` | OpenRouter API key (optional) | — |
+| `OPENROUTER_MODEL` | OpenRouter model to use | `anthropic/claude-3.5-haiku` |
 
-> As variáveis também podem ser alteradas em tempo de execução pelo ícone de **Configurações** na interface, sem necessidade de reiniciar o stack.
+> You can also change these at runtime from the **Settings** icon in the interface, without restarting the stack.
 
 ---
 
-## Arquitetura
+## Architecture
 
-- **Backend** (`src/server`): Python 3.12, FastAPI, Uvicorn. BackgroundTasks para IA e parsers pesados.
-- **Domínio** (`src/domain`): clientes LLM (Ollama + OpenRouter), parser Nmap, gerador de relatório, sync de notas.
-- **Banco de Dados** (`src/data`): SQLAlchemy 2.x + SQLite. UUID para IDs de projeto (previne IDOR).
+- **Backend** (`src/server`): Python 3.12, FastAPI, Uvicorn. BackgroundTasks for AI calls and heavy parsers.
+- **Domain** (`src/domain`): LLM clients (Ollama + OpenRouter), Nmap parser, report generator, note sync.
+- **Database** (`src/data`): SQLAlchemy 2.x + SQLite. UUID project IDs (prevents IDOR).
 - **Frontend** (`src/web`): React 18, Vite, TailwindCSS 3, Cytoscape.js, EasyMDE.
-- **Proxy**: Nginx — roteamento `/api` → FastAPI, `/` → React.
+- **Proxy**: Nginx, routing `/api` → FastAPI and `/` → React.
 
 ---
 
 ## Troubleshooting
 
-**O stack não sobe / portas ocupadas?**
-Verifique se as portas `80`, `8000` e `11434` estão livres. Execute `./reset.sh` para limpar containers e imagens.
+**The stack does not start, or ports are taken?**
+Check that ports `80`, `8000` and `11434` are free. Run `./reset.sh` to clean up containers and images.
 
-**Erro `404 No endpoints available` no OpenRouter?**
-Acesse `openrouter.ai/settings/privacy` e relaxe a política de guardrails de dados.
+**`404 No endpoints available` error on OpenRouter?**
+Go to `openrouter.ai/settings/privacy` and relax the data guardrail policy.
 
-**O Ollama não responde?**
-Confirme que o serviço está saudável: `docker compose ps`. O container `ollama` usa profile `local` — suba com `--profile local` ou via `./start.sh`.
+**Ollama does not answer?**
+Check that the service is healthy: `docker compose ps`. The `ollama` container uses the `local` profile; start it with `--profile local` or through `./start.sh`.
 
-**Explicação de nó desatualizada?**
-O cache de explicações é invalidado automaticamente ao ingerir novos scans ou adicionar notas. Se necessário, exclua o nó e reimporte o scan.
-
----
-
-
-## Aviso Legal
-
-O PwnCortex é destinado **exclusivamente a testes de segurança autorizados**. O uso desta ferramenta contra sistemas sem permissão escrita explícita é ilegal. Os autores não se responsabilizam por uso indevido.
+**Outdated node explanation?**
+The explanation cache is invalidated automatically when you ingest new scans or add notes. If needed, delete the node and import the scan again.
 
 ---
 
-## Licença
+## Legal notice
 
-Este projeto está licenciado sob a **AGPL-3.0**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+PwnCortex is intended **only for authorized security testing**. Using it against systems without explicit written permission is illegal. The authors are not responsible for misuse.
+
+---
+
+## License
+
+This project is licensed under the **AGPL-3.0**. See [LICENSE](LICENSE) for details.
